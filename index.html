@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Code Submit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/clike/clike.min.js"></script>
+    <style>
+        .task-desc {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f8f8;
+            border-left: 4px solid #007acc;
+        }
+        pre {
+            background: #eee;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Выберите задачу</h1>
+
+<select id="task-select" onchange="updateDescription()"></select>
+<div id="description" class="task-desc"></div>
+
+<textarea id="code">// Введите код на C++</textarea>
+<br>
+<button onclick="submitCode()">Отправить</button>
+
+<div id="result"></div>
+
+<script>
+    let tasks = {};
+    let editor;
+
+    async function loadTasks() {
+        const res = await fetch('/tasks.json');
+        tasks = await res.json();
+
+        const select = document.getElementById("task-select");
+        for (const key in tasks) {
+            const option = document.createElement("option");
+            option.value = key;
+            option.textContent = tasks[key].title;
+            select.appendChild(option);
+        }
+
+        updateDescription();
+    }
+
+    function updateDescription() {
+        const select = document.getElementById("task-select");
+        const task = select.value;
+        const info = tasks[task];
+        const desc = document.getElementById("description");
+        if (info) {
+            desc.innerHTML = `<h3>${info.title}</h3><p>${info.description}</p><pre>${info.example}</pre>`;
+        }
+    }
+
+    async function submitCode() {
+        const task = document.getElementById("task-select").value;
+        const tests_dir = tasks[task]["tests_dir"];
+        const code = editor.getValue()
+        document.getElementById("result").innerHTML = `<h2>Идёт тестирование:</h2><pre></pre>`
+
+        const res = await fetch('/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tests_dir, code })
+        });
+
+        const resultText = await res.text();
+        document.getElementById("result").innerHTML = `<h2>Результат:</h2><pre>${resultText}</pre>`;
+    }
+
+    window.onload = async () => {
+        await loadTasks();
+        editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+            lineNumbers: true,
+            mode: "text/x-c++src"
+        });
+    };
+</script>
+</body>
+</html>
