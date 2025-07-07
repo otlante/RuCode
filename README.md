@@ -1,3 +1,5 @@
+Платформа для решения задач с тестированием пользовательского кода в контейнере.
+
 ```
 $ docker build -t cpp-code-tester docker/
 $ g++ server.cpp mongoose.cpp tester.cpp -std=c++17 -lpthread -o server 
