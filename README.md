@@ -4,7 +4,7 @@ $ g++ server.cpp mongoose.cpp tester.cpp -std=c++17 -lpthread -o server
 $ ./server
 ```
 
-[Смотреть демо - demo.mov](demo.mov)
+[Смотреть демо](https://drive.google.com/file/d/1zKYz45tKj2flU9x_LHqPrdjgGn3hzcjl/view?usp=sharing)
 
 [Примеры - EXAMPLES.md](EXAMPLES.md)
 
